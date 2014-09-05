@@ -9,10 +9,16 @@ get('/', function() {
 	echo "[]";
 });
 
+get('/geo/(.*)', function($name) {
+	$uri = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
+	$result = file_get_contents($uri . $name);
+	$json = json_decode($result);
+	$location = json_encode($json->results[0]->geometry->location);
+	$point = json_decode($location);
+	echo $point->lat . ',' . $point->lng;
+});
+
 get('/search/(.*)', function($q) {
-
-	// TODO FIX ERROR WHEN SEARCH WITH SPACE
-
 	/*
 	try {
 		$con = createPDO();
@@ -41,7 +47,7 @@ get('/search/(.*)', function($q) {
 						"application/x-www-form-urlencoded;charset=UTF-8\n" .
 					"Content-Length: " . strlen($data) . "\n",
 				'content' => $data,
-				),
+				)
 			)
 		)
 	);
@@ -50,13 +56,17 @@ get('/search/(.*)', function($q) {
 	$token = $json->{"access_token"};
 	// echo $token;
 
- 	$result = file_get_contents(
-		"https://api.twitter.com/1.1/search/tweets.json?q=" . $q, false,
+	// $uri = "https://api.twitter.com/1.1/search/tweets.json?q=" . $q;
+	$uri = "https://api.twitter.com/1.1/search/tweets.json" .
+		"?q=&result_type=recent&" .
+		"geocode=13.00,100.00,50km&count=10";
+
+ 	$result = file_get_contents($uri, false,
 		stream_context_create(
 			array(
 				"http" => array(
 					"method" => "GET",
-					"header" => "Authorization: Bearer " . $token . "\r\n"
+					"header" => "Authorization: Bearer " . $token . "\n"
 				)
 			)
 		)

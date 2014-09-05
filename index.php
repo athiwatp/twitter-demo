@@ -49,7 +49,13 @@ function search() {
 				var lat = json.statuses[i].geo.coordinates[0];
 				var lng = json.statuses[i].geo.coordinates[1];
 				console.log(lat + ' ' + lng);
-				addMarker(lat, lng);
+				addMarker({lat: lat, lng: lng,
+					icon: json.statuses[i].user.profile_image_url_https,
+					text: json.statuses[i].text,
+					user: json.statuses[i].user.screen_name
+				});
+				console.log(json.statuses[i].user.screen_name);
+				console.log(json.statuses[i].text);
 			}
 		}
 	});
@@ -62,11 +68,13 @@ function history() {
 	});
 }
 
-function addMarker(lat, lng) {
-	var pos = new google.maps.LatLng(lat, lng);
+function addMarker(data) {
+	var pos = new google.maps.LatLng(data.lat, data.lng);
 	var marker = new google.maps.Marker({
 		position: pos,
-		map: map
+		map: map,
+		icon: data.icon,
+		title: data.text
 	});
 }
 
