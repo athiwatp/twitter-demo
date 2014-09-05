@@ -1,13 +1,33 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
 	<title>Twitter Demo</title>
-	<link rel="stylesheet" href="/css/bootstrap.min.css" />
-</head>
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 
+	<link rel="stylesheet" href="/css/bootstrap.min.css" />
+	<style type="text/css">
+		html { height: 100% }
+		body { height: 100%; margin: 0; padding: 0 }
+		#map-canvas { height: 100% }
+	</style>
+	<script type="text/javascript"
+		src="https://maps.googleapis.com/maps/api/js">
+	</script>
+	<script type="text/javascript">
+		function initialize() {
+			var mapOptions = {
+				center: new google.maps.LatLng(0, 0),
+				zoom: 2
+			};
+			var map = new google.maps.Map(document.getElementById("map-canvas"),
+				mapOptions);
+		}
+		google.maps.event.addDomListener(window, 'load', initialize);
+	</script>
+</head>
 <body>
 
-<div class="container">
+<div class="container" style="z-index: 10000; position: absolute; bottom:40px;">
 	<form role="form" action="javascript:search()">
 		<div class="row">
 			<div class="col-xs-8">
@@ -19,6 +39,8 @@
 		</div>
 	</form>
 </div>
+
+<div id="map-canvas"></div>
 
 <script src="/js/jquery.js"></script>
 <script src="/js/bootstrap.min.js"></script>
