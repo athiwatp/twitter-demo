@@ -28,7 +28,15 @@
 		var query = $("[name=search]").val();
 		$.get('/api.php/search/' + query)
 		.success(function(result) {
-			console.log(result);
+			var json = JSON.parse(result);
+			console.log(json);
+			for (var i = 0; i < json.statuses.length; i++) {
+				if (json.statuses[i].geo != null) {
+					var lat = json.statuses[i].geo.coordinates[0];
+					var lng = json.statuses[i].geo.coordinates[1];
+					console.log(lat + ' ' + lng);
+				}
+			}
 		});
 	}
 
