@@ -9,6 +9,11 @@
 		html { height: 100% }
 		body { height: 100%; margin: 0; padding: 0 }
 		#map-canvas { height: 100% }
+
+		body.wait, body.wait *{
+			cursor: wait !important;
+		}
+
 	</style>
 	<script type="text/javascript"
 		src="https://maps.googleapis.com/maps/api/js">
@@ -39,24 +44,36 @@
 var map = null;
 
 function search() {
+	console.log('Searching ...');
+	$("body").toggleClass("wait");
+	
 	var query = $("[name=search]").val();
 	$.get('/api.php/search/' + query)
 	.success(function(result) {
-		var json = JSON.parse(result);
-		console.log(json);
-		for (var i = 0; i < json.statuses.length; i++) {
-			if (json.statuses[i].geo != null) {
-				var lat = json.statuses[i].geo.coordinates[0];
-				var lng = json.statuses[i].geo.coordinates[1];
-				console.log(lat + ' ' + lng);
-				addMarker({lat: lat, lng: lng,
-					icon: json.statuses[i].user.profile_image_url_https,
-					text: json.statuses[i].text,
-					user: json.statuses[i].user.screen_name
-				});
-				console.log(json.statuses[i].user.screen_name);
-				console.log(json.statuses[i].text);
+		// clear all marker here
+		$("body").toggleClass("wait");
+		console.log(result);
+
+		try {
+			var json = JSON.parse(result);
+			console.log(json);
+			for (var i = 0; i < json.statuses.length; i++) {
+				if (json.statuses[i].geo != null) {
+					var lat = json.statuses[i].geo.coordinates[0];
+					var lng = json.statuses[i].geo.coordinates[1];
+					console.log(lat + ' ' + lng);
+					addMarker({lat: lat, lng: lng,
+						icon: json.statuses[i].user.profile_image_url_https,
+						text: json.statuses[i].text,
+						user: json.statuses[i].user.screen_name
+					});
+					// console.log(json.statuses[i].user.screen_name);
+					// console.log(json.statuses[i].text);
+				}
 			}
+		}
+		catch (e) {
+			console.log(e);
 		}
 	});
 }

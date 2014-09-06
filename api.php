@@ -1,9 +1,9 @@
 <?
 require 'nanite.php';
 
-function createPDO() {
-	return new PDO('mysql:host=localhost;dbname=map', 'root', 'password');
-}
+$db_server		= "mysql:host=localhost;dbname=map";
+$db_user		= "root";
+$db_password	= "password";
 
 get('/', function() {
 	echo "[]";
@@ -11,26 +11,58 @@ get('/', function() {
 
 get('/geo/(.*)', function($name) {
 	$uri = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
-	$result = file_get_contents($uri . $name);
+	$result = file_get_contents($uri . urlencode($name));
 	$json = json_decode($result);
-	$location = json_encode($json->results[0]->geometry->location);
-	$point = json_decode($location);
-	echo $point->lat . ',' . $point->lng;
+	// $location = json_encode($json->results[0]->geometry->location);
+	// $point = json_decode($location);
+	// echo $point->lat . ',' . $point->lng;
+	echo
+		$json->results[0]->geometry->location->lat . ' ' .
+		$json->results[0]->geometry->location->lng;
 });
 
 get('/search/(.*)', function($q) {
-	/*
+	global $db_server;
+	global $db_user;
+	global $db_password;
+
 	try {
-		$con = createPDO();
-		$stm = $con->prepare("insert into history(query) values(:q)");
+		$con = new PDO($db_server, $db_user, $db_password);
+		$stm = $con->prepare("select * from history where query=:q");
 		$stm->execute(array("q" => $q));
-		echo "[]";
+		$res = $stm->fetchAll(PDO::FETCH_ASSOC);
+		if (count($res) == 0) {
+			// insert
+			$tweets = getTweet($q);
+			echo $tweets;
+			/*
+			$stm = $con->prepare("insert into history(query, result) " .
+				"values(:q, :tweet)");
+			$stm->execute(array("q" => $q, "tweet" => $tweets));
+			*/
+		}
+		else {
+			// check time
+		}
 	}
 	catch (Exception $e) {
 		echo "[]";
 	}
-	*/
+});
 
+function getTweet($name) {
+	// 1. get lat,lng from google geocode
+	$uri = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
+	$result = file_get_contents($uri . urlencode($name));
+	$json = json_decode($result);
+	// $location = json_encode($json->results[0]->geometry->location);
+	// $point = json_decode($location);
+	// echo $point->lat . ',' . $point->lng;
+	$lat = $json->results[0]->geometry->location->lat;
+	$lng = $json->results[0]->geometry->location->lng;
+	// echo $lat . ' ' . $lng;
+
+	// 2. get twitter token
 	$encode = "TWRFdHBmTVBNTHRubDE0Nmg1SkVTcjJrSzpKNVk2aUlScG5TMHh6YU54SXpBT1" .
 				"VwTUVNRFFPZ1BaUDUwUlBYaGhZYnBCVmQ5eGZsbQ==";
 	$data = "grant_type=client_credentials";
@@ -56,10 +88,11 @@ get('/search/(.*)', function($q) {
 	$token = $json->{"access_token"};
 	// echo $token;
 
+	// 3. get tweets
 	// $uri = "https://api.twitter.com/1.1/search/tweets.json?q=" . $q;
 	$uri = "https://api.twitter.com/1.1/search/tweets.json" .
 		"?q=&result_type=recent&" .
-		"geocode=13.00,100.00,50km&count=10";
+		"geocode=$lat,$lng,50km&count=10";
 
  	$result = file_get_contents($uri, false,
 		stream_context_create(
@@ -72,13 +105,16 @@ get('/search/(.*)', function($q) {
 		)
 	);
 
-	echo ($result);
-
-});
+	// echo $result;
+	return $result;
+}
 
 get('/history', function() {
+	global $db_server;
+	global $db_user;
+	global $db_password;
 	try {
-		$con = createPDO();
+		$con = new PDO($db_server, $db_user, $db_password);
 		$stm = $con->prepare("select * from history order by timestamp desc");
 		$stm->execute();
 		echo json_encode($stm->fetchAll(PDO::FETCH_ASSOC));
@@ -89,15 +125,45 @@ get('/history', function() {
 });
 
 get('/test', function() {
+	global $db_server;
+	global $db_user;
+	global $db_password;
 	try {
-		$con = createPDO();
-		$stm = $con->prepare('select * from documents');
+		$con = new PDO($db_server, $db_user, $db_password);
+		$stm = $con->prepare("select * from history");
 		$stm->execute();
 		echo json_encode($stm->fetchAll(PDO::FETCH_ASSOC));
 		// while($row = $stm->fetch()) print_r($row);
 	}
 	catch(Exception $err) {
 		echo '[]';
-		// echo 'ERROR: ' . $err->getMessage();
+		echo 'ERROR: ' . $err->getMessage();
 	}
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// note

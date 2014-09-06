@@ -2,9 +2,6 @@ FIX ERROR FOR SPACE
 
 .text
 .user
-	screen_name:"theponpons"
-	profile_image_url_https:
-	"https://pbs.twimg.com/profile_images/506762209083396096/tjRzxg_I_normal.jpeg"
 
 
 
