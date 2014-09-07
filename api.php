@@ -28,21 +28,23 @@ get('/search/(.*)', function($q) {
 
 	try {
 		$con = new PDO($db_server, $db_user, $db_password);
-		$stm = $con->prepare("select * from history where query=:q");
+		$stm = $con->prepare("select * from history where query=:q " .
+			"and utc_timestamp() - timestamp < 60 * 60 ");
 		$stm->execute(array("q" => $q));
 		$res = $stm->fetchAll(PDO::FETCH_ASSOC);
 		if (count($res) == 0) {
-			// insert
 			$tweets = getTweet($q);
-			echo $tweets;
-			/*
-			$stm = $con->prepare("insert into history(query, result) " .
-				"values(:q, :tweet)");
+			$stm = $con->prepare(
+				"insert into history(query, result, timestamp) " .
+				"values(:q, :tweet, utc_timestamp()) " .
+				"on duplicate key " .
+				"update result=:tweet, timestamp=utc_timestamp()"
+				);
 			$stm->execute(array("q" => $q, "tweet" => $tweets));
-			*/
+			echo $tweets;
 		}
 		else {
-			// check time
+			echo $res[0]["result"];
 		}
 	}
 	catch (Exception $e) {

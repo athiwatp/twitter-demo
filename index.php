@@ -3,25 +3,12 @@
 <head>
 	<title>Twitter Demo</title>
 	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-
 	<link rel="stylesheet" href="/css/bootstrap.min.css" />
-	<style type="text/css">
-		html { height: 100% }
-		body { height: 100%; margin: 0; padding: 0 }
-		#map-canvas { height: 100% }
-
-		body.wait, body.wait *{
-			cursor: wait !important;
-		}
-
-	</style>
-	<script type="text/javascript"
-		src="https://maps.googleapis.com/maps/api/js">
-	</script>
+	<link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
 
-<div class="container" style="z-index: 10000; position: absolute; bottom:40px;">
+<div class="container" id="main">
 	<form role="form" action="javascript:search()">
 		<div class="row">
 			<div class="col-xs-8">
@@ -38,15 +25,26 @@
 
 <script src="/js/jquery.js"></script>
 <script src="/js/bootstrap.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js"></script>
 
 <script>
 
 var map = null;
+google.maps.event.addDomListener(window, 'load', initialize);
+
+function initialize() {
+	var options = {
+		center: new google.maps.LatLng(0, 0),
+		zoom: 2
+	};
+	map = new google.maps.Map(document.getElementById("map-canvas"),
+		options);
+}
 
 function search() {
 	console.log('Searching ...');
 	$("body").toggleClass("wait");
-	
+
 	var query = $("[name=search]").val();
 	$.get('/api.php/search/' + query)
 	.success(function(result) {
@@ -95,15 +93,6 @@ function addMarker(data) {
 	});
 }
 
-google.maps.event.addDomListener(window, 'load', initialize);
-function initialize() {
-	var options = {
-		center: new google.maps.LatLng(0, 0),
-		zoom: 2
-	};
-	map = new google.maps.Map(document.getElementById("map-canvas"),
-		options);
-}
 </script>
 
 </body>
