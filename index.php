@@ -9,19 +9,39 @@
 <body>
 
 <div class="container" id="main">
-	<form role="form" action="javascript:search()">
+	<form role="form" action="javascript:onSearch()">
 		<div class="row">
 			<div class="col-xs-8">
 				<input type="text" class="form-control" name="search" />
 			</div>
 			<div class="col-xs-4">
 				<input type="submit" class="btn btn-primary" value="Search" />
+				<input type="button" class="btn btn-default" value="History"
+					onclick="onHistory()" />
 			</div>
 		</div>
 	</form>
 </div>
 
 <div id="map-canvas"></div>
+
+<div class="modal fade" id="history">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title">History</h4>
+			</div>
+			<div class="modal-body">
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default"
+					data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
 
 <script src="/js/jquery.js"></script>
 <script src="/js/bootstrap.min.js"></script>
@@ -31,6 +51,7 @@
 
 var map = null;
 var markers = new Array();
+var searchHistory = new Array();
 google.maps.event.addDomListener(window, 'load', initialize);
 
 function initialize() {
@@ -42,16 +63,22 @@ function initialize() {
 		options);
 }
 
-function search() {
-	console.log('Searching ...');
-	$("body").toggleClass("wait");
-
+function onSearch() {
 	var query = $("[name=search]").val();
+	// console.log(query);
+	search(query);
+}
+
+function search(query) {
+	$("body").toggleClass("wait");
+	$("#history").modal("hide");
+	$("[name=search]").val(query);
+	addHistory(query);
+
 	$.get('/api.php/search/' + query)
 	.success(function(result) {
 		$("body").toggleClass("wait");
 		// console.log(result);
-		console.log('Done');
 
 		// remove all markers
 		for (var i = markers.length; i > 0; i--) {
@@ -84,11 +111,27 @@ function search() {
 	});
 }
 
-function history() {
-	$.get("/api.php/history")
-	.success(function(result) {
-		console.log(result);
-	});
+function addHistory(query) {
+	var found = -1;
+	for (var i = 0; i < searchHistory.length; i++) {
+		if (query.toUpperCase() === searchHistory[i].toUpperCase()) {
+			found = i;
+			break;
+		}
+	}
+	if (found === -1) {
+		searchHistory.push(query);
+	}
+}
+
+function onHistory() {
+	$("#history .modal-body").html("");
+	var template = "<p><a href='javascript:search(\"_\")'>_</a></p>";
+	for (var i = 0; i < searchHistory.length; i++) {
+		var html = template.replace(/_/g, searchHistory[i]);
+		$("#history .modal-body").append(html);
+	}
+	$("#history").modal("show");
 }
 
 function addMarker(data) {

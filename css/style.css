@@ -14,3 +14,7 @@ body.wait *{
 	position: absolute;
 	bottom: 40px;
 }
+
+#history {
+	z-index: 10000;
+}
