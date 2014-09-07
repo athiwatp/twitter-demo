@@ -30,6 +30,7 @@
 <script>
 
 var map = null;
+var markers = new Array();
 google.maps.event.addDomListener(window, 'load', initialize);
 
 function initialize() {
@@ -50,16 +51,23 @@ function search() {
 	.success(function(result) {
 		// clear all marker here
 		$("body").toggleClass("wait");
-		console.log(result);
+		// console.log(result);
 
 		try {
 			var json = JSON.parse(result);
-			console.log(json);
+			// console.log(json);
+
+			// remove all markers
+			for (var i = markers.length; i > 0; i--) {
+				markers[i - 1].setMap(null);
+				markers.pop();
+			}
+
 			for (var i = 0; i < json.statuses.length; i++) {
 				if (json.statuses[i].geo != null) {
 					var lat = json.statuses[i].geo.coordinates[0];
 					var lng = json.statuses[i].geo.coordinates[1];
-					console.log(lat + ' ' + lng);
+					// console.log(lat + ' ' + lng);
 					addMarker({lat: lat, lng: lng,
 						icon: json.statuses[i].user.profile_image_url_https,
 						text: json.statuses[i].text,
@@ -91,6 +99,7 @@ function addMarker(data) {
 		icon: data.icon,
 		title: data.text
 	});
+	markers.push(marker);
 }
 
 </script>
