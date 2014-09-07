@@ -49,19 +49,19 @@ function search() {
 	var query = $("[name=search]").val();
 	$.get('/api.php/search/' + query)
 	.success(function(result) {
-		// clear all marker here
 		$("body").toggleClass("wait");
 		// console.log(result);
+		console.log('Done');
+
+		// remove all markers
+		for (var i = markers.length; i > 0; i--) {
+			markers[i - 1].setMap(null);
+			markers.pop();
+		}
 
 		try {
 			var json = JSON.parse(result);
 			// console.log(json);
-
-			// remove all markers
-			for (var i = markers.length; i > 0; i--) {
-				markers[i - 1].setMap(null);
-				markers.pop();
-			}
 
 			for (var i = 0; i < json.statuses.length; i++) {
 				if (json.statuses[i].geo != null) {

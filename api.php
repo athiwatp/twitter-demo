@@ -2,7 +2,7 @@
 require 'nanite.php';
 
 $db_server		= "mysql:host=localhost;dbname=map";
-$db_user		= "root";
+$db_user		= "map";
 $db_password	= "password";
 
 get('/', function() {
