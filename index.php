@@ -51,7 +51,6 @@
 
 var map = null;
 var markers = new Array();
-var searchHistory = new Array();
 google.maps.event.addDomListener(window, 'load', initialize);
 
 function initialize() {
@@ -111,27 +110,18 @@ function search(query) {
 	});
 }
 
-function addHistory(query) {
-	var found = -1;
-	for (var i = 0; i < searchHistory.length; i++) {
-		if (query.toUpperCase() === searchHistory[i].toUpperCase()) {
-			found = i;
-			break;
-		}
-	}
-	if (found === -1) {
-		searchHistory.push(query);
-	}
-}
-
 function onHistory() {
-	$("#history .modal-body").html("");
-	var template = "<p><a href='javascript:search(\"_\")'>_</a></p>";
-	for (var i = 0; i < searchHistory.length; i++) {
-		var html = template.replace(/_/g, searchHistory[i]);
-		$("#history .modal-body").append(html);
-	}
-	$("#history").modal("show");
+	$.get("/api.php/history").success(function (result) {
+		// console.log(result);
+		var json = JSON.parse(result);
+		$("#history .modal-body").html("");
+		var template = "<p><a href='javascript:search(\"_\")'>_</a></p>";
+		for (var i = 0; i < json.length; i++) {
+			var html = template.replace(/_/g, json[i]);
+			$("#history .modal-body").append(html);
+		}
+		$("#history").modal("show");
+	});
 }
 
 function addMarker(data) {

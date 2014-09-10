@@ -26,6 +26,7 @@ create table history (
 
 What is the cookie do you mean
 How about duplicated search history
+How many items to display
 
 
 */
