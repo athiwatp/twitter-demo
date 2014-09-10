@@ -76,7 +76,6 @@ function search(query) {
 	$.get('/api.php/search/' + query)
 	.success(function(result) {
 		$("body").toggleClass("wait");
-		console.log(result);
 
 		// remove all markers
 		for (var i = markers.length; i > 0; i--) {
@@ -86,20 +85,23 @@ function search(query) {
 
 		try {
 			var json = JSON.parse(result);
-			console.log(json);
-
+			var zoomed = false;
 			for (var i = 0; i < json.statuses.length; i++) {
 				if (json.statuses[i].geo != null) {
 					var lat = json.statuses[i].geo.coordinates[0];
 					var lng = json.statuses[i].geo.coordinates[1];
-					// console.log(lat + ' ' + lng);
 					addMarker({lat: lat, lng: lng,
 						icon: json.statuses[i].user.profile_image_url_https,
 						text: json.statuses[i].text,
 						user: json.statuses[i].user.screen_name
 					});
-					// console.log(json.statuses[i].user.screen_name);
-					// console.log(json.statuses[i].text);
+
+					if (!zoomed) {
+						map.setZoom(10);
+						map.setCenter(new google.maps.LatLng(
+							lat, lng));
+						zoomed = true;
+					}
 				}
 			}
 		}
