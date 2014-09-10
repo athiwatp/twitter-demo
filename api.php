@@ -139,6 +139,7 @@ get('/clear', function() {
 	echo '[]';
 });
 
+/*
 get('/test', function() {
 	global $db_server;
 	global $db_user;
@@ -156,29 +157,4 @@ get('/test', function() {
 	}
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// note
+*/
