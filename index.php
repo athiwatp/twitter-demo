@@ -72,12 +72,11 @@ function search(query) {
 	$("body").toggleClass("wait");
 	$("#history").modal("hide");
 	$("[name=search]").val(query);
-	addHistory(query);
 
 	$.get('/api.php/search/' + query)
 	.success(function(result) {
 		$("body").toggleClass("wait");
-		// console.log(result);
+		console.log(result);
 
 		// remove all markers
 		for (var i = markers.length; i > 0; i--) {
@@ -87,7 +86,7 @@ function search(query) {
 
 		try {
 			var json = JSON.parse(result);
-			// console.log(json);
+			console.log(json);
 
 			for (var i = 0; i < json.statuses.length; i++) {
 				if (json.statuses[i].geo != null) {
